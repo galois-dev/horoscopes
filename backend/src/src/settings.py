@@ -11,9 +11,15 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import  dotenv_values
+import os
 
-conf = dotenv_values("../.env")
+# From python-dotenv
+config = {
+    **dotenv_values("shared.env"),  # load shared development variables
+    **dotenv_values("prod.env"),  # load sensitive variables
+    **os.environ,  # override loaded values with environment variables
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,12 +29,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = conf["SECRET_KEY"]
+SECRET_KEY = config["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config["DEBUG"]
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+]
 
 
 # Application definition
@@ -40,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -75,13 +84,23 @@ WSGI_APPLICATION = 'src.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+if config["DB_ENGINE"] != "sqlite3":
+    DATABASES = {
+        'default': {
+            "ENGINE": "django.db.backends." +config["DB_ENGINE"],
+            "NAME": config["DB_NAME"],
+            "HOST": config["DB_HOST"],
+            "USER": config["DB_USER"],
+            "PASSWORD": config["DB_PASSWORD"],
+            "PORT": config["DB_PORT"],
+        }
+    }
 
 
 # Password validation
