@@ -22,7 +22,6 @@ class HoroscopeAdmin(admin.ModelAdmin):
         'created_by',
     )
     
-
 @admin.register(Horoscope_Message)
 class Horoscope_MessageAdmin(admin.ModelAdmin):
     fields = (
