@@ -19,6 +19,20 @@ class Horoscope(models.Model):
     def __str__(self):
         return self.name
 
+    def __init__(self, **kwargs):
+        if "request" in kwargs:
+            request = kwargs.pop("request")
+            self.created_by = request.user
+            self.updated_by = request.user
+        super(Horoscope, self).__init__(**kwargs)
+            
+    def save(self, **kwargs):
+        if "request" in kwargs:
+            request = kwargs.pop("request")
+            self.created_by = request.user
+            self.updated_by = request.user
+        super(Horoscope, self).save(**kwargs)
+
     class Meta:
         ordering = ['-created_at']
 
@@ -31,6 +45,18 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+    def __init__(self, **kwargs):
+        if "request" in kwargs:
+            request = kwargs.pop("request")
+            self.updated_by = request.user
+        super(Tag, self).__init__(**kwargs)
+            
+    def save(self, **kwargs):
+        if "request" in kwargs:
+            request = kwargs.pop("request")
+            self.updated_by = request.user
+        super(Tag, self).save(**kwargs)
 
     class Meta:
         ordering = ['-created_at']
